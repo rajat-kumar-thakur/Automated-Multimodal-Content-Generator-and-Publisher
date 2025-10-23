@@ -1,0 +1,655 @@
+{
+  "name": "Multimodal Content Generator & Publisher",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 6
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "subreddit": "={{$json.subreddit}}",
+        "sort": "hot",
+        "limit": 10
+      },
+      "id": "reddit-node",
+      "name": "Fetch Reddit Trending",
+      "type": "n8n-nodes-base.reddit",
+      "typeVersion": 1,
+      "position": [450, 300],
+      "credentials": {
+        "redditOAuth2Api": {
+          "id": "reddit_credentials",
+          "name": "Reddit OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Filter and score posts\nconst items = $input.all();\nconst scored = items.map(item => {\n  const post = item.json;\n  const score = post.score || 0;\n  const comments = post.num_comments || 0;\n  const engagement = score + (comments * 2);\n  \n  return {\n    json: {\n      ...post,\n      engagement_score: engagement,\n      title: post.title,\n      content: post.selftext || post.title,\n      url: post.url,\n      subreddit: post.subreddit\n    }\n  };\n});\n\n// Sort by engagement and take top 3\nscored.sort((a, b) => b.json.engagement_score - a.json.engagement_score);\nreturn scored.slice(0, 3);"
+      },
+      "id": "filter-posts",
+      "name": "Filter & Score Posts",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o",
+        "messages": {
+          "values": [
+            {
+              "content": "=You are a viral content creator. Transform this Reddit post into engaging short-form video content.\n\nOriginal Title: {{$json.title}}\nContent: {{$json.content}}\n\nCreate:\n1. A catchy hook (first 3 seconds)\n2. Main content (30-45 seconds)\n3. Call-to-action\n\nFormat: Script for voiceover, keep it conversational and engaging. Max 60 seconds when read aloud.",
+              "role": "user"
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.8
+        }
+      },
+      "id": "openai-reframe",
+      "name": "AI Content Reframe",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1,
+      "position": [850, 300],
+      "credentials": {
+        "openAiApi": {
+          "id": "openai_credentials",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o",
+        "messages": {
+          "values": [
+            {
+              "content": "=Generate a detailed image prompt for this content:\n\n{{$json.script}}\n\nCreate a vivid, eye-catching image description suitable for AI image generation. Focus on visual elements, colors, mood, and composition. Keep it under 500 characters.",
+              "role": "user"
+            }
+          ]
+        }
+      },
+      "id": "generate-image-prompt",
+      "name": "Generate Image Prompt",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1,
+      "position": [1050, 300],
+      "credentials": {
+        "openAiApi": {
+          "id": "openai_credentials",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "prompt": "={{$json.image_prompt}}",
+        "options": {
+          "size": "1024x1792",
+          "quality": "hd",
+          "style": "vivid"
+        }
+      },
+      "id": "dalle-image",
+      "name": "Generate Image (DALL-E)",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [1250, 300],
+      "credentials": {
+        "openAiApi": {
+          "id": "openai_credentials",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{$json.image_url}}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "download-image",
+      "name": "Download Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [1450, 300]
+    },
+    {
+      "parameters": {
+        "text": "={{$json.script}}",
+        "options": {
+          "model": "tts-1-hd",
+          "voice": "alloy"
+        }
+      },
+      "id": "tts-audio",
+      "name": "Generate Voiceover",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [1450, 450],
+      "credentials": {
+        "openAiApi": {
+          "id": "openai_credentials",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Translate script to multiple languages\nconst languages = ['es', 'fr', 'de', 'pt', 'hi'];\nconst script = $input.first().json.script;\n\nreturn languages.map(lang => ({\n  json: {\n    target_language: lang,\n    original_script: script\n  }\n}));"
+      },
+      "id": "prepare-translations",
+      "name": "Prepare Translations",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1050, 500]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o",
+        "messages": {
+          "values": [
+            {
+              "content": "=Translate this script to {{$json.target_language}}. Maintain the tone and timing.\n\nOriginal:\n{{$json.original_script}}\n\nProvide ONLY the translated text, no explanations.",
+              "role": "user"
+            }
+          ]
+        }
+      },
+      "id": "translate-script",
+      "name": "Translate Script",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1,
+      "position": [1250, 500],
+      "credentials": {
+        "openAiApi": {
+          "id": "openai_credentials",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate SRT subtitle format\nconst script = $json.translated_script || $json.script;\nconst words = script.split(' ');\nconst wordsPerSegment = 8;\nlet srt = '';\nlet index = 1;\n\nfor (let i = 0; i < words.length; i += wordsPerSegment) {\n  const segment = words.slice(i, i + wordsPerSegment).join(' ');\n  const startTime = (i / wordsPerSegment) * 3;\n  const endTime = startTime + 3;\n  \n  const formatTime = (seconds) => {\n    const h = Math.floor(seconds / 3600).toString().padStart(2, '0');\n    const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');\n    const s = Math.floor(seconds % 60).toString().padStart(2, '0');\n    const ms = Math.floor((seconds % 1) * 1000).toString().padStart(3, '0');\n    return `${h}:${m}:${s},${ms}`;\n  };\n  \n  srt += `${index}\\n${formatTime(startTime)} --> ${formatTime(endTime)}\\n${segment}\\n\\n`;\n  index++;\n}\n\nreturn [{\n  json: {\n    ...($input.first().json),\n    subtitle_file: srt,\n    language: $json.target_language || 'en'\n  }\n}];"
+      },
+      "id": "generate-subtitles",
+      "name": "Generate Subtitles",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1450, 500]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.videoprocessing.example/create",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "image_url",
+              "value": "={{$json.image_url}}"
+            },
+            {
+              "name": "audio_url",
+              "value": "={{$json.audio_url}}"
+            },
+            {
+              "name": "subtitles",
+              "value": "={{$json.subtitle_file}}"
+            },
+            {
+              "name": "format",
+              "value": "vertical_9_16"
+            },
+            {
+              "name": "effects",
+              "value": "zoom_pan"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "create-video",
+      "name": "Create Video (API)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [1650, 300],
+      "notes": "Replace with actual video API like Runway, Pictory, or FFmpeg service"
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "title": "={{$json.title}}",
+        "description": "={{$json.description}}",
+        "videoFile": "={{$json.video_binary}}",
+        "options": {
+          "categoryId": "22",
+          "privacyStatus": "public",
+          "tags": "={{$json.hashtags.split(' ').join(',')}}"
+        }
+      },
+      "id": "youtube-upload",
+      "name": "Upload to YouTube Shorts",
+      "type": "n8n-nodes-base.youtube",
+      "typeVersion": 1,
+      "position": [1850, 200],
+      "credentials": {
+        "youtubeOAuth2Api": {
+          "id": "youtube_credentials",
+          "name": "YouTube OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "caption": "={{$json.description}}",
+        "mediaType": "reel",
+        "mediaFile": "={{$json.video_binary}}"
+      },
+      "id": "instagram-upload",
+      "name": "Upload to Instagram Reels",
+      "type": "n8n-nodes-base.instagram",
+      "typeVersion": 1,
+      "position": [1850, 300],
+      "credentials": {
+        "instagramBusinessApi": {
+          "id": "instagram_credentials",
+          "name": "Instagram Business API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://open.tiktokapis.com/v2/post/publish/video/init/",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "post_info",
+              "value": "={\"title\": \"{{$json.title}}\", \"privacy_level\": \"PUBLIC_TO_EVERYONE\"}"
+            },
+            {
+              "name": "source_info",
+              "value": "={\"source\": \"FILE_UPLOAD\", \"video_size\": {{$json.video_size}}}"
+            }
+          ]
+        }
+      },
+      "id": "tiktok-upload",
+      "name": "Upload to TikTok",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [1850, 400],
+      "credentials": {
+        "oAuth2Api": {
+          "id": "tiktok_credentials",
+          "name": "TikTok OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": "your_spreadsheet_id",
+        "sheetName": "Content Log",
+        "columns": {
+          "mappings": [
+            {
+              "column": "Timestamp",
+              "value": "={{$now}}"
+            },
+            {
+              "column": "Original Post",
+              "value": "={{$json.title}}"
+            },
+            {
+              "column": "Platform",
+              "value": "={{$json.platform}}"
+            },
+            {
+              "column": "Status",
+              "value": "={{$json.upload_status}}"
+            },
+            {
+              "column": "Video URL",
+              "value": "={{$json.video_url}}"
+            }
+          ]
+        }
+      },
+      "id": "log-to-sheets",
+      "name": "Log to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [2050, 300],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "sheets_credentials",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "database",
+        "operation": "create",
+        "databaseId": "notion_database_id",
+        "properties": {
+          "values": [
+            {
+              "key": "Title",
+              "value": "={{$json.title}}"
+            },
+            {
+              "key": "Status",
+              "value": "Published"
+            },
+            {
+              "key": "Platforms",
+              "value": "={{$json.platforms}}"
+            },
+            {
+              "key": "Engagement Score",
+              "value": "={{$json.engagement_score}}"
+            }
+          ]
+        }
+      },
+      "id": "log-to-notion",
+      "name": "Log to Notion",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2,
+      "position": [2050, 400],
+      "credentials": {
+        "notionApi": {
+          "id": "notion_credentials",
+          "name": "Notion API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": [
+            {
+              "conditions": {
+                "options": [
+                  {
+                    "leftValue": "={{$json.engagement_score}}",
+                    "operation": "largerEqual",
+                    "rightValue": 5000
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "id": "check-performance",
+      "name": "Check Performance Threshold",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [850, 500]
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": "your_slack_channel",
+        "text": "=🔥 High-performing content detected!\n\nTitle: {{$json.title}}\nEngagement: {{$json.engagement_score}}\nSubreddit: r/{{$json.subreddit}}\n\nProcessing for publication...",
+        "otherOptions": {}
+      },
+      "id": "slack-alert",
+      "name": "Alert Team (Slack)",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [1050, 600],
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "slack_credentials",
+          "name": "Slack OAuth2 API"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Fetch Reddit Trending",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Reddit Trending": {
+      "main": [
+        [
+          {
+            "node": "Filter & Score Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter & Score Posts": {
+      "main": [
+        [
+          {
+            "node": "AI Content Reframe",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Check Performance Threshold",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Content Reframe": {
+      "main": [
+        [
+          {
+            "node": "Generate Image Prompt",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Prepare Translations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Image Prompt": {
+      "main": [
+        [
+          {
+            "node": "Generate Image (DALL-E)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Image (DALL-E)": {
+      "main": [
+        [
+          {
+            "node": "Download Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Image": {
+      "main": [
+        [
+          {
+            "node": "Generate Voiceover",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Voiceover": {
+      "main": [
+        [
+          {
+            "node": "Create Video (API)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Translations": {
+      "main": [
+        [
+          {
+            "node": "Translate Script",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Translate Script": {
+      "main": [
+        [
+          {
+            "node": "Generate Subtitles",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Subtitles": {
+      "main": [
+        [
+          {
+            "node": "Create Video (API)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Video (API)": {
+      "main": [
+        [
+          {
+            "node": "Upload to YouTube Shorts",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Upload to Instagram Reels",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Upload to TikTok",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload to YouTube Shorts": {
+      "main": [
+        [
+          {
+            "node": "Log to Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload to Instagram Reels": {
+      "main": [
+        [
+          {
+            "node": "Log to Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload to TikTok": {
+      "main": [
+        [
+          {
+            "node": "Log to Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log to Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Log to Notion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Performance Threshold": {
+      "main": [
+        [
+          {
+            "node": "Alert Team (Slack)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
