@@ -1,22 +1,22 @@
 {
-  "name": "My workflow 2",
+  "name": "multi modal content generator and publisher",
   "nodes": [
     {
       "parameters": {
         "resource": "video",
         "operation": "upload",
-        "title": "={{ $('Limit1').item.json.output.youtube_content.title }}",
+        "title": "={{ $('Filter top ideas').item.json.output.youtube_content.title }}",
         "regionCode": "IN",
         "categoryId": "1",
         "options": {
-          "description": "={{ $('Limit1').item.json.output.youtube_content.description }}"
+          "description": "={{ $('Filter top ideas').item.json.output.youtube_content.description }}"
         }
       },
       "type": "n8n-nodes-base.youTube",
       "typeVersion": 1,
       "position": [
-        1336,
-        160
+        1360,
+        352
       ],
       "id": "85cea4ee-342e-4f43-9566-6eb2b8b8a446",
       "name": "Upload a video",
@@ -26,54 +26,6 @@
           "name": "YouTube account"
         }
       }
-    },
-    {
-      "parameters": {},
-      "type": "n8n-nodes-base.manualTrigger",
-      "typeVersion": 1,
-      "position": [
-        -864,
-        64
-      ],
-      "id": "c650b3ac-1aa7-4e9a-97a7-1b5137f8bd21",
-      "name": "When clicking ‘Execute workflow’"
-    },
-    {
-      "parameters": {
-        "operation": "getAll",
-        "subreddit": "all",
-        "filters": {}
-      },
-      "type": "n8n-nodes-base.reddit",
-      "typeVersion": 1,
-      "position": [
-        -640,
-        64
-      ],
-      "id": "adaeb8f8-16f3-4422-8679-33a3f2d9f08e",
-      "name": "Get many posts",
-      "credentials": {
-        "redditOAuth2Api": {
-          "id": "0ECJG8fq32ik27zj",
-          "name": "Reddit account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "promptType": "define",
-        "text": "=# Reddit Content Analyzer & Viral Content Generator\n\nYou are an expert content strategist and viral content creator. Analyze the provided Reddit post and generate comprehensive content for multiple platforms.\n\n## INPUT DATA:\n- Title: {{ $json.title }}\n- Content: {{ $json.selftext }}\n- Upvotes: {{ $json.ups }}\n- Comments: {{ $json.num_comments }}\n\n## YOUR TASK:\nAnalyze the Reddit post's viral potential and create optimized content for social media platforms. Focus on creating two primary assets:\n1. A static image for Twitter/X with viral caption\n2. An 8-second video concept with viral caption\n\n## OUTPUT FORMAT:\nProvide a valid JSON response with the following structure:\n\n```json\n{\n  \"virality_score\": <0-100, based on engagement, controversy, relatability, and shareability>,\n  \"virality_analysis\": \"<brief explanation of why this content could go viral>\",\n  \n  \"twitter_image\": {\n    \"dalle_prompt\": \"<detailed DALL-E prompt for creating an eye-catching, shareable image that captures the essence of the Reddit post. Include style, colors, composition, mood, and key visual elements. Make it scroll-stopping and memorable.>\",\n    \"viral_caption\": \"<hook-driven caption under 280 chars with strategic use of line breaks, relevant emojis, and 2-3 trending hashtags. Start with a curiosity gap or strong statement.>\"\n  },\n  \n  \"video_clip_8sec\": {\n    \"concept\": \"<detailed 8-second video concept with specific shot descriptions, text overlays, transitions, and visual hooks. Break down second-by-second if needed.>\",\n    \"script\": \"<punchy voiceover or text overlay script that builds curiosity and delivers value in 8 seconds>\",\n    \"viral_caption\": \"<compelling caption for video post that creates FOMO or curiosity, includes call-to-action, uses emojis strategically, and 2-3 hashtags>\",\n    \"visual_style\": \"<specify: modern/minimal/bold/cinematic/trendy, with color palette and motion style>\",\n    \"music_mood\": \"<suggest background music mood: upbeat/dramatic/suspenseful/chill>\"\n  },\n  \n  \"youtube_content\": {\n    \"title\": \"<60 chars max, SEO-optimized, clickable title with power words>\",\n    \"description\": \"<compelling description with keywords, timestamps, call-to-action, and 8-10 relevant hashtags>\",\n    \"video_script\": \"<engaging 60-second script with hook, context, main content, and strong CTA. Include timing markers [0:00-0:05], [0:05-0:15], etc.>\"\n  },\n  \n  \"instagram_post\": {\n    \"caption\": \"<engaging caption with line breaks, 10-15 relevant emojis, storytelling elements, and 20-30 hashtags grouped at the end>\",\n    \"carousel_ideas\": [\"<idea 1>\", \"<idea 2>\", \"<idea 3>\"]\n  },\n  \n  \"telegram_message\": \"<formatted message with bold/italic markdown, emojis, and clear structure that works in Telegram's format>\",\n  \n  \"tags\": [\"<tag1>\", \"<tag2>\", \"<tag3>\", \"<tag4>\", \"<tag5>\"],\n  \n  \"content_strategy\": {\n    \"best_posting_times\": \"<suggest optimal posting times based on content type>\",\n    \"target_audience\": \"<define the primary audience>\",\n    \"engagement_tactics\": [\"<tactic 1>\", \"<tactic 2>\", \"<tactic 3>\"]\n  }\n}\n```\n\n## GUIDELINES:\n\n### For Twitter Image (DALL-E Prompt):\n- Create prompts that generate scroll-stopping visuals\n- Include specific art styles (e.g., \"3D render\", \"minimalist illustration\", \"photorealistic\", \"bold graphic design\")\n- Specify color schemes that pop on Twitter's feed\n- Include text placement suggestions if needed\n- Make it shareable and meme-worthy when appropriate\n- Consider trending visual aesthetics\n\n### For Viral Captions:\n- Start with a hook that creates curiosity or emotion\n- Use strategic line breaks for readability\n- Include power words (exclusive, secret, shocking, mind-blowing, etc.)\n- Add 2-3 trending, relevant hashtags (research current trends)\n- Create FOMO (Fear Of Missing Out)\n- Include implicit or explicit call-to-action\n- Use emojis that enhance, not distract\n\n### For 8-Second Video Concept:\n- Design for silent viewing (70% of users watch without sound)\n- Include bold text overlays with key message\n- Create a visual hook in the first 1 second\n- Build tension or curiosity throughout\n- End with a payoff or cliffhanger\n- Optimize for vertical (9:16) or square (1:1) format\n- Suggest dynamic transitions and motion graphics\n\n### General Best Practices:\n- Adapt the core message for each platform's culture\n- Maintain authenticity while optimizing for virality\n- Ensure all content is factually accurate to the source\n- Use platform-specific features (Twitter threads, IG carousels, etc.)\n- Consider accessibility (alt text suggestions, captions)\n\n## IMPORTANT:\n- Return ONLY valid JSON, no additional text\n- Ensure all string values are properly escaped\n- Keep all content appropriate and brand-safe\n- Make content actionable and valuable to the audience\n- Prioritize shareability and engagement potential",
-        "hasOutputParser": true,
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.agent",
-      "typeVersion": 2.2,
-      "position": [
-        32,
-        64
-      ],
-      "id": "5f493335-0bcc-411d-86c4-c2d2c4f11510",
-      "name": "AI Agent"
     },
     {
       "parameters": {
@@ -88,8 +40,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.2,
       "position": [
-        164,
-        496
+        192,
+        688
       ],
       "id": "85da876a-5502-4a06-ba17-197c27d06296",
       "name": "OpenAI Chat Model",
@@ -101,46 +53,12 @@
       }
     },
     {
-      "parameters": {
-        "sortFieldsUi": {
-          "sortField": [
-            {
-              "fieldName": "ups",
-              "order": "descending"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.sort",
-      "typeVersion": 1,
-      "position": [
-        -416,
-        64
-      ],
-      "id": "390ae8c0-663e-426b-a909-690b6e628f43",
-      "name": "Sort"
-    },
-    {
-      "parameters": {
-        "maxItems": 5
-      },
-      "type": "n8n-nodes-base.limit",
-      "typeVersion": 1,
-      "position": [
-        -192,
-        64
-      ],
-      "id": "9a1cab52-3c68-4c16-887b-fa0b5c02404f",
-      "name": "Limit"
-    },
-    {
       "parameters": {},
       "type": "@n8n/n8n-nodes-langchain.toolThink",
       "typeVersion": 1.1,
       "position": [
-        168,
-        288
+        192,
+        480
       ],
       "id": "75846672-0efc-436c-8b56-6f9cbcd24021",
       "name": "Think1"
@@ -154,97 +72,11 @@
       "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
       "typeVersion": 1.3,
       "position": [
-        296,
-        288
+        320,
+        480
       ],
       "id": "28a7e000-bffc-4a03-bd7d-d44d65a2f1d6",
       "name": "Structured Output Parser"
-    },
-    {
-      "parameters": {
-        "resource": "image",
-        "modelId": {
-          "__rl": true,
-          "value": "models/imagen-4.0-fast-generate-001",
-          "mode": "list",
-          "cachedResultName": "models/imagen-4.0-fast-generate-001"
-        },
-        "prompt": "={{ $json.output.twitter_image.dalle_prompt }}",
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.googleGemini",
-      "typeVersion": 1,
-      "position": [
-        1112,
-        -32
-      ],
-      "id": "3ac31530-1a5c-4b33-adbf-4c70503f5526",
-      "name": "Generate an image1",
-      "credentials": {
-        "googlePalmApi": {
-          "id": "MyS4AcaHMwUWPVbl",
-          "name": "Google Gemini(PaLM) Api account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "sortFieldsUi": {
-          "sortField": [
-            {
-              "fieldName": "output.virality_score",
-              "order": "descending"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.sort",
-      "typeVersion": 1,
-      "position": [
-        560,
-        64
-      ],
-      "id": "2fde8d45-be90-4fd4-a58f-2f9ba90122f9",
-      "name": "Sort1"
-    },
-    {
-      "parameters": {},
-      "type": "n8n-nodes-base.limit",
-      "typeVersion": 1,
-      "position": [
-        800,
-        64
-      ],
-      "id": "9f97d3a3-aa44-43e2-8892-77e6822a9993",
-      "name": "Limit1"
-    },
-    {
-      "parameters": {
-        "resource": "video",
-        "modelId": {
-          "__rl": true,
-          "value": "models/veo-3.1-fast-generate-preview",
-          "mode": "list",
-          "cachedResultName": "models/veo-3.1-fast-generate-preview"
-        },
-        "prompt": "=# AI Video Generation Prompt\n\nGenerate a vertical 9:16 social media video with the following specifications:\n\n## Video Parameters\n- **Duration:** 8 seconds\n- **Aspect Ratio:** 9:16 (vertical/mobile-optimized)\n- **Visual Style:** {{ $json.output.video_clip_8sec.visual_style }}\n- **Audio:** {{ $json.output.video_clip_8sec.music_mood }}\n\n## Video Concept\n{{ $json.output.video_clip_8sec.concept }}\n\n## Script\n{{ $json.output.video_clip_8sec.script }}\n\n## Caption\n{{ $json.output.video_clip_8sec.viral_caption }}\n\n\n**Target Audience:** {{ $json.output.content_strategy.target_audience }}\n\n**Tags:** {{ $json.output.tags }}\n\nGenerate this video based on the specifications above and it sshould conclude in the 8 seconds itself.",
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.googleGemini",
-      "typeVersion": 1,
-      "position": [
-        1112,
-        160
-      ],
-      "id": "31f864ae-f7dd-446d-9a8c-d7d4be7c0c50",
-      "name": "Generate a video",
-      "credentials": {
-        "googlePalmApi": {
-          "id": "MyS4AcaHMwUWPVbl",
-          "name": "Google Gemini(PaLM) Api account"
-        }
-      }
     },
     {
       "parameters": {
@@ -272,7 +104,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        1336,
+        1360,
         -32
       ],
       "id": "0a67a169-4d15-41f6-8c4a-10fa6585e04a",
@@ -290,7 +122,7 @@
     },
     {
       "parameters": {
-        "text": "={{ $('Limit1').item.json.output.twitter_image.viral_caption }}",
+        "text": "={{ $('Filter top ideas').item.json.output.twitter_image.viral_caption }}",
         "additionalFields": {
           "attachments": "={{ $json.data.id }}"
         }
@@ -298,7 +130,7 @@
       "type": "n8n-nodes-base.twitter",
       "typeVersion": 2,
       "position": [
-        1560,
+        1584,
         -32
       ],
       "id": "c2fb2e51-d350-4e1e-a87e-fd7a94df71c5",
@@ -317,426 +149,518 @@
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.3,
       "position": [
-        40,
-        288
+        64,
+        480
       ],
       "id": "662ba99b-b175-4c06-b581-af28f8530308",
       "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "subreddit": "all",
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.reddit",
+      "typeVersion": 1,
+      "position": [
+        -624,
+        256
+      ],
+      "id": "adaeb8f8-16f3-4422-8679-33a3f2d9f08e",
+      "name": "Scrape Trendy post from reddit",
+      "credentials": {
+        "redditOAuth2Api": {
+          "id": "0ECJG8fq32ik27zj",
+          "name": "Reddit account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 10
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -848,
+        256
+      ],
+      "id": "4be1b67b-6ce4-4f29-be59-fcb53e462271",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "sortFieldsUi": {
+          "sortField": [
+            {
+              "fieldName": "ups",
+              "order": "descending"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.sort",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        256
+      ],
+      "id": "390ae8c0-663e-426b-a909-690b6e628f43",
+      "name": "Sort posts based on virality"
+    },
+    {
+      "parameters": {
+        "maxItems": 5
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        -176,
+        256
+      ],
+      "id": "9a1cab52-3c68-4c16-887b-fa0b5c02404f",
+      "name": "Filter Top 5 Posts"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=# Reddit Content Analyzer & Viral Content Generator\n\nYou are an expert content strategist and viral content creator. Analyze the provided Reddit post and generate comprehensive content for multiple platforms.\n\n## INPUT DATA:\n- Title: {{ $json.title }}\n- Content: {{ $json.selftext }}\n- Upvotes: {{ $json.ups }}\n- Comments: {{ $json.num_comments }}\n\n## YOUR TASK:\nAnalyze the Reddit post's viral potential and create optimized content for social media platforms. Focus on creating two primary assets:\n1. A static image for Twitter/X with viral caption\n2. An 8-second video concept with viral caption\n\n## OUTPUT FORMAT:\nProvide a valid JSON response with the following structure:\n\n```json\n{\n  \"virality_score\": <0-100, based on engagement, controversy, relatability, and shareability>,\n  \"virality_analysis\": \"<brief explanation of why this content could go viral>\",\n  \n  \"twitter_image\": {\n    \"dalle_prompt\": \"<detailed DALL-E prompt for creating an eye-catching, shareable image that captures the essence of the Reddit post. Include style, colors, composition, mood, and key visual elements. Make it scroll-stopping and memorable.>\",\n    \"viral_caption\": \"<hook-driven caption under 280 chars with strategic use of line breaks, relevant emojis, and 2-3 trending hashtags. Start with a curiosity gap or strong statement.>\"\n  },\n  \n  \"video_clip_8sec\": {\n    \"concept\": \"<detailed 8-second video concept with specific shot descriptions, text overlays, transitions, and visual hooks. Break down second-by-second if needed.>\",\n    \"script\": \"<punchy voiceover or text overlay script that builds curiosity and delivers value in 8 seconds>\",\n    \"viral_caption\": \"<compelling caption for video post that creates FOMO or curiosity, includes call-to-action, uses emojis strategically, and 2-3 hashtags>\",\n    \"visual_style\": \"<specify: modern/minimal/bold/cinematic/trendy, with color palette and motion style>\",\n    \"music_mood\": \"<suggest background music mood: upbeat/dramatic/suspenseful/chill>\"\n  },\n  \n  \"youtube_content\": {\n    \"title\": \"<60 chars max, SEO-optimized, clickable title with power words>\",\n    \"description\": \"<compelling description with keywords, timestamps, call-to-action, and 8-10 relevant hashtags>\",\n    \"video_script\": \"<engaging 60-second script with hook, context, main content, and strong CTA. Include timing markers [0:00-0:05], [0:05-0:15], etc.>\"\n  },\n  \n  \"instagram_post\": {\n    \"caption\": \"<engaging caption with line breaks, 10-15 relevant emojis, storytelling elements, and 20-30 hashtags grouped at the end>\",\n    \"carousel_ideas\": [\"<idea 1>\", \"<idea 2>\", \"<idea 3>\"]\n  },\n  \n  \"telegram_message\": \"<formatted message with bold/italic markdown, emojis, and clear structure that works in Telegram's format>\",\n  \n  \"tags\": [\"<tag1>\", \"<tag2>\", \"<tag3>\", \"<tag4>\", \"<tag5>\"],\n  \n  \"content_strategy\": {\n    \"best_posting_times\": \"<suggest optimal posting times based on content type>\",\n    \"target_audience\": \"<define the primary audience>\",\n    \"engagement_tactics\": [\"<tactic 1>\", \"<tactic 2>\", \"<tactic 3>\"]\n  }\n}\n```\n\n## GUIDELINES:\n\n### For Twitter Image (DALL-E Prompt):\n- Create prompts that generate scroll-stopping visuals\n- Include specific art styles (e.g., \"3D render\", \"minimalist illustration\", \"photorealistic\", \"bold graphic design\")\n- Specify color schemes that pop on Twitter's feed\n- Include text placement suggestions if needed\n- Make it shareable and meme-worthy when appropriate\n- Consider trending visual aesthetics\n\n### For Viral Captions:\n- Start with a hook that creates curiosity or emotion\n- Use strategic line breaks for readability\n- Include power words (exclusive, secret, shocking, mind-blowing, etc.)\n- Add 2-3 trending, relevant hashtags (research current trends)\n- Create FOMO (Fear Of Missing Out)\n- Include implicit or explicit call-to-action\n- Use emojis that enhance, not distract\n\n### For 8-Second Video Concept:\n- Design for silent viewing (70% of users watch without sound)\n- Include bold text overlays with key message\n- Create a visual hook in the first 1 second\n- Build tension or curiosity throughout\n- End with a payoff or cliffhanger\n- Optimize for vertical (9:16) or square (1:1) format\n- Suggest dynamic transitions and motion graphics\n\n### General Best Practices:\n- Adapt the core message for each platform's culture\n- Maintain authenticity while optimizing for virality\n- Ensure all content is factually accurate to the source\n- Use platform-specific features (Twitter threads, IG carousels, etc.)\n- Consider accessibility (alt text suggestions, captions)\n\n## IMPORTANT:\n- Return ONLY valid JSON, no additional text\n- Ensure all string values are properly escaped\n- Keep all content appropriate and brand-safe\n- Make content actionable and valuable to the audience\n- Prioritize shareability and engagement potential",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        48,
+        256
+      ],
+      "id": "5f493335-0bcc-411d-86c4-c2d2c4f11510",
+      "name": "Viral Content Generator"
+    },
+    {
+      "parameters": {
+        "sortFieldsUi": {
+          "sortField": [
+            {
+              "fieldName": "output.virality_score",
+              "order": "descending"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.sort",
+      "typeVersion": 1,
+      "position": [
+        688,
+        256
+      ],
+      "id": "2fde8d45-be90-4fd4-a58f-2f9ba90122f9",
+      "name": "Sort ideas based on virality score"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        912,
+        256
+      ],
+      "id": "9f97d3a3-aa44-43e2-8892-77e6822a9993",
+      "name": "Filter top ideas"
+    },
+    {
+      "parameters": {
+        "httpRequestMethod": "POST",
+        "graphApiVersion": "v23.0",
+        "node": "17841472943134441",
+        "edge": "media_publish",
+        "options": {
+          "queryParameters": {
+            "parameter": [
+              {
+                "name": "creation_id",
+                "value": "={{ $json.id }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "typeVersion": 1,
+      "position": [
+        1968,
+        -224
+      ],
+      "id": "d337685a-7d47-4dd9-8d59-84bdeb6c2a4f",
+      "name": "Instagram Post",
+      "credentials": {
+        "facebookGraphApi": {
+          "id": "839tKBuLp8GbtbML",
+          "name": "Facebook Graph account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpRequestMethod": "POST",
+        "graphApiVersion": "v23.0",
+        "node": "17841472943134441",
+        "edge": "media_publish",
+        "options": {
+          "queryParameters": {
+            "parameter": [
+              {
+                "name": "creation_id",
+                "value": "={{ $json.id }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "typeVersion": 1,
+      "position": [
+        1952,
+        736
+      ],
+      "id": "bc31bf97-27a3-4787-90e4-46d9806f9a97",
+      "name": "Instagram Reel",
+      "credentials": {
+        "facebookGraphApi": {
+          "id": "839tKBuLp8GbtbML",
+          "name": "Facebook Graph account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "={{ $json.id }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1Mjp3nEon0_98TleMT4UZoMWKBG3039Bh",
+          "mode": "list",
+          "cachedResultName": "aidemos_videos",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1Mjp3nEon0_98TleMT4UZoMWKBG3039Bh"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1360,
+        736
+      ],
+      "id": "4afd4153-339b-453d-b30a-d071cabbb3f5",
+      "name": "Upload video",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "OnYaBrVyZSUdEMRx",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "={{ $json.id }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1jJEzXHMNKeKrcoVIXSTgwQ8s1BE8QP8u",
+          "mode": "list",
+          "cachedResultName": "aidemos_images",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1jJEzXHMNKeKrcoVIXSTgwQ8s1BE8QP8u"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1360,
+        -224
+      ],
+      "id": "cff7d2ed-aded-4870-ae75-45af1436d353",
+      "name": "Upload image",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "OnYaBrVyZSUdEMRx",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendVideo",
+        "chatId": "@n8ntelegrama",
+        "binaryData": true,
+        "additionalFields": {
+          "caption": "={{ $('Filter top ideas').item.json.output.youtube_content.title }}"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1360,
+        544
+      ],
+      "id": "3c6db68a-bb70-4710-bf94-6b9c8a6a3402",
+      "name": "Post video to telegram channel",
+      "webhookId": "34201177-0e73-4de3-b595-54bb2e64b282",
+      "credentials": {
+        "telegramApi": {
+          "id": "JpW8hBC9dEp1v7FE",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendPhoto",
+        "chatId": "@n8ntelegrama",
+        "binaryData": true,
+        "additionalFields": {
+          "caption": "={{ $('Filter top ideas').item.json.output.twitter_image.viral_caption }}"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1360,
+        160
+      ],
+      "id": "ece8761a-7c76-4924-a08e-17aa100b0cb6",
+      "name": "Post photo to telegram channel",
+      "webhookId": "835043ea-94fd-449c-98e9-0327939688fc",
+      "credentials": {
+        "telegramApi": {
+          "id": "JpW8hBC9dEp1v7FE",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "modelId": {
+          "__rl": true,
+          "value": "models/imagen-4.0-fast-generate-001",
+          "mode": "list",
+          "cachedResultName": "models/imagen-4.0-fast-generate-001"
+        },
+        "prompt": "={{ $json.output.twitter_image.dalle_prompt }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        1136,
+        -32
+      ],
+      "id": "3ac31530-1a5c-4b33-adbf-4c70503f5526",
+      "name": "Generate image",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "MyS4AcaHMwUWPVbl",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "video",
+        "modelId": {
+          "__rl": true,
+          "value": "models/veo-3.1-generate-preview",
+          "mode": "list",
+          "cachedResultName": "models/veo-3.1-generate-preview"
+        },
+        "prompt": "=# AI Video Generation Prompt\n\nGenerate a vertical 9:16 social media video with the following specifications:\n\n## Video Parameters\n- **Duration:** 8 seconds\n- **Aspect Ratio:** 9:16 (vertical/mobile-optimized)\n- **Visual Style:** {{ $json.output.video_clip_8sec.visual_style }}\n- **Audio:** {{ $json.output.video_clip_8sec.music_mood }}\n\n## Video Concept\n{{ $json.output.video_clip_8sec.concept }}\n\n## Script\n{{ $json.output.video_clip_8sec.script }}\n\n## Caption\n{{ $json.output.video_clip_8sec.viral_caption }}\n\n\n**Target Audience:** {{ $json.output.content_strategy.target_audience }}\n\n**Tags:** {{ $json.output.tags }}\n\nGenerate this video based on the specifications above and it sshould conclude in the 8 seconds itself.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        1136,
+        544
+      ],
+      "id": "31f864ae-f7dd-446d-9a8c-d7d4be7c0c50",
+      "name": "Generate video",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "MyS4AcaHMwUWPVbl",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "share",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "permissionsUi": {
+          "permissionsValues": {
+            "role": "writer",
+            "type": "anyone",
+            "allowFileDiscovery": true
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1584,
+        -224
+      ],
+      "id": "2f6ea4d9-9634-4158-b1d3-5afce19c4428",
+      "name": "share image",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "OnYaBrVyZSUdEMRx",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "share",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "permissionsUi": {
+          "permissionsValues": {
+            "role": "writer",
+            "type": "anyone",
+            "allowFileDiscovery": true
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1584,
+        736
+      ],
+      "id": "49711907-bd4d-45a3-8b6c-05ba3c80df27",
+      "name": "share video",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "OnYaBrVyZSUdEMRx",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpRequestMethod": "POST",
+        "graphApiVersion": "v23.0",
+        "node": "17841472943134441",
+        "edge": "media",
+        "options": {
+          "queryParameters": {
+            "parameter": [
+              {
+                "name": "video_url",
+                "value": "={{ $('Upload image').item.json.webViewLink }}"
+              },
+              {
+                "name": "caption",
+                "value": "={{ $('Filter top ideas').item.json.output.twitter_image.viral_caption }}"
+              },
+              {
+                "name": "media_type",
+                "value": "REELS"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "typeVersion": 1,
+      "position": [
+        1808,
+        -224
+      ],
+      "id": "6dffd150-f481-4094-8c21-54ec579aab83",
+      "name": "Facebook Image Container",
+      "credentials": {
+        "facebookGraphApi": {
+          "id": "839tKBuLp8GbtbML",
+          "name": "Facebook Graph account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpRequestMethod": "POST",
+        "graphApiVersion": "v23.0",
+        "node": "17841472943134441",
+        "edge": "media",
+        "options": {
+          "queryParameters": {
+            "parameter": [
+              {
+                "name": "video_url",
+                "value": "=https://drive.google.com/file/d/1MrncMkPeAFXn9ovg-plqKgVFMFkQjXgq/view?usp=drivesdk"
+              },
+              {
+                "name": "caption",
+                "value": "=hello"
+              },
+              {
+                "name": "media_type",
+                "value": "REELS"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "typeVersion": 1,
+      "position": [
+        1808,
+        736
+      ],
+      "id": "579719f6-b6b4-4ac8-936b-ce71c5e955a9",
+      "name": "Facebook Reel Container",
+      "credentials": {
+        "facebookGraphApi": {
+          "id": "839tKBuLp8GbtbML",
+          "name": "Facebook Graph account"
+        }
+      }
     }
   ],
-  "pinData": {
-    "Limit1": [
-      {
-        "json": {
-          "output": {
-            "virality_score": 85,
-            "virality_analysis": "High shareability and relatability: a surprising, funny local fail involving a major brand (Home Depot), quick escalation to mayor and local news, and a tidy resolution (removed next day). Strong engagement potential from local communities, civic-minded viewers, and meme culture; also easy to repurpose across platforms.",
-            "twitter_image": {
-              "dalle_prompt": "Photorealistic editorial-style composite: wide-angle shot of a Home Depot parking lot at golden hour with exaggerated, clearly visible low 'parking curbs' (short concrete blocks) lined up where speed bumps should be. Include a confused driver leaning out of a car, a local news van with satellite dish and cameraman in a bright vest, and a small group of townspeople pointing. Style: high-contrast, cinematic, shallow depth of field, slight film grain. Colors: Home Depot orange and navy pops, warm golden light, cool blue shadows. Composition: foreground close-up of a curb (sharp detail, wet texture), midground car & people, background store facade and news van. Add a bold, white headline text placeholder area in the upper third: \"Parking Curbs?!\" (leave negative space for copy). Mood: humorous, surreal, slightly absurd. Visual hooks: dramatic angle, expressive faces, visible city hall parking sign. Text placement: headline top-left, small caption bottom-right for source tag. Make the image scroll-stopping and meme-ready.",
-              "viral_caption": "They installed parking CURBS… instead of speed bumps. 🤦‍♂️\nNews & the mayor showed up — and they were gone the next day. 📰👷‍♂️\nShare if your town would lose it. 🔁 #LocalNews #Fail"
-            },
-            "video_clip_8sec": {
-              "concept": "Vertical 9:16, dynamic 8-second sequence optimized for silent autoplay. Second-by-second breakdown:\n0.0-0.8s: Instant visual hook — extreme close-up of a concrete parking curb with a tiny orange cone beside it; bold white text overlay: \"Wait, what?\" (fast zoom-out). Quick whoosh transition.\n0.8-2.0s: Reveal shot — wide pan across the parking lot showing multiple parking curbs placed where speed bumps normally go; drivers looking confused. Text overlay: \"Not speed bumps?\"\n2.0-3.5s: Cut to a local news van + reporter on phone + mayor walking toward the lot (medium shots). Text overlay: \"Mayor & news showed up\" with small news ticker animation.\n3.5-5.5s: Fast montage of workers lifting curbs, tape measures, people pointing; speed-ramped clips, quick jump cuts. Text overlay: \"Removed next day\" with checkmark animation.\n5.5-7.5s: Reaction shots — laughing drivers, thumbs-up to camera, local resident shaking head. Text overlay: \"Town wins ✅\"\n7.5-8.0s: Final frame — bold end card: \"You can't make this up.\" + CTA: \"Share if your town would freak out\" with social handles and small logo. Smooth fade-out.\nVisual hooks: high-contrast color grading (orange/blue), animated text blocks, light leaks, quick whip pans. Silent-friendly: all critical info in bold text overlays and short captions. Accessibility: include closed captions baked into video.",
-              "script": "Text overlays/voice (short lines timed to video):\n0.0-0.8s: \"Wait, what?\"\n0.8-2.0s: \"They installed CURBS… not speed bumps\"\n2.0-3.5s: \"Mayor & news showed up\"\n3.5-5.5s: \"Workers removed them the next day\"\n5.5-7.5s: \"Town: relieved. Internet: obsessed.\"\n7.5-8.0s: \"Share if this would happen in your town 👀\"",
-              "viral_caption": "You won't believe what Home Depot put in the parking lot 🚧 Mayor + news got involved — gone the next day. Share if your town would lose it! 👀🔁 #LocalNews #Fail",
-              "visual_style": "modern/cinematic/trendy — bold editorial cuts, orange & navy color palette with warm highlights and cool shadows, snappy motion graphics and kinetic text animations",
-              "music_mood": "suspenseful"
-            },
-            "youtube_content": {
-              "title": "Shocking Home Depot Fail — Parking Curbs, Not Speed Bumps",
-              "description": "A small-town Home Depot accidentally installed parking curbs where speed bumps should've been — and the mayor and local news stepped in. Watch the timeline and reaction that led to the curbs being removed the next day. \n\nTimestamps:\n0:00 Hook — what happened\n0:10 How it escalated\n0:25 Mayor & news arrive\n0:40 Removal & aftermath\n0:50 Final thoughts\n\nIf you liked this breakdown, subscribe for more local viral stories and short explainers. Hit the bell to get notified.\n\nFollow us on Twitter/X: @YourHandle\nInstagram: @YourHandle\nSend tips: tips@yourhandle.com\n\nHashtags: #HomeDepot #LocalNews #Viral #ParkingFail #Mayor #Community #UrbanDesign #News",
-              "video_script": "[0:00-0:05] Hook — \"What happens when Home Depot installs parking CURBS instead of speed bumps? — you have to see this.\"\n[0:05-0:15] Context — \"A local store put short concrete curbs across lanes where speed bumps normally slow traffic. Shoppers were confused, and someone asked: who signed off on this?\"\n[0:15-0:30] Escalation — \"Within hours the story hit local feeds. The mayor showed up, the local news rolled in, and public pressure mounted — all captured on camera.\"\n[0:30-0:45] Outcome — \"The result? Workers removed the curbs the very next day. Officials blamed miscommunication; residents called it a bizarre fail.\"\n[0:45-0:55] Takeaway — \"It’s a reminder that small decisions can blow up quickly when a brand, local government, and community collide.\"\n[0:55-1:00] CTA — \"If you enjoyed this, like and subscribe for more short viral explainers. Tell us: what’s the weirdest thing your town's done?\""
-            },
-            "instagram_post": {
-              "caption": "You won't believe this local FAIL — Home Depot installed parking CURBS where speed bumps should be. 🤦‍♀️🤯\n\nThe blame game started, the mayor showed up, the news covered it — and the curbs were gone the next day. Town: relieved. Internet: obsessed. 😂\n\nWould this happen in your town? Tell us the wildest local fail you've seen. 👇\n\n🧱🚗📰👷‍♂️🏛️🔧📸🤣🙌🤦‍♂️\n\n#HomeDepot #LocalNews #ParkingFail #Mayor #Community #RetailFail #SmallTown #Viral #News #Accountability #UrbanDesign #CityHall #Construction #DesignFail #PublicSafety #Trending #Funny #Meme #CitizenJournalism #LocalPolitics #Share",
-              "carousel_ideas": [
-                "Cover: bold headline image — close-up of a parking curb with text 'Parking Curbs?!' (attention-grabbing)",
-                "Wide shot: full parking lot showing multiple curbs and confused drivers, annotated arrows pointing to curbs",
-                "Reaction: photos of the news van, mayor, and townspeople with short captions (\"Mayor shows up\", \"Residents react\")",
-                "Removal: workers taking curbs out and before/after comparison",
-                "Close-ups & source: screenshots of local news headline and a short quote summarizing the outcome"
-              ]
-            },
-            "telegram_message": "**Unreal local fail — Home Depot installed PARKING CURBS instead of speed bumps.** 🤦‍♂️🚧\n\n• What happened: Short concrete curbs placed where speed bumps should be.\n• Escalation: Mayor + local news showed up the next day.\n• Outcome: Curbs removed — crisis averted.\n\n📸 Watch the clip. Share if your town would freak out. 🔁\n\n➡️ Want more local viral stories? Follow us for daily weirdness and community wins.",
-            "tags": [
-              "Home Depot",
-              "local news",
-              "viral",
-              "parking fail",
-              "mayor",
-              "accountability",
-              "community",
-              "retail fail"
-            ],
-            "content_strategy": {
-              "best_posting_times": "Twitter/X: 11:30am–1:30pm and 6:00pm–9:00pm local time; Instagram: 11:00am–1:00pm and 7:00pm–9:00pm; YouTube Shorts: 5:00pm–8:00pm; Telegram: 8:00am and 6:00pm for high engagement.",
-              "target_audience": "Local residents, community-minded social users, small-town news followers, urban design/DIY enthusiasts, and meme-hungry audiences aged 18–45.",
-              "engagement_tactics": [
-                "Ask a direct local question (e.g., 'Would this happen in your town?') to prompt comments and stories",
-                "Tag local news outlets, the store, and city officials when posting to boost reach and possible resharing",
-                "Use a poll or thread on Twitter/X to invite user-submitted local fail stories and photos",
-                "Encourage UGC: ask followers to post their own 'weird local fix' photos with a dedicated hashtag",
-                "Post follow-ups (before/after, official statements) to keep the story trending for 24–48 hours"
-              ]
-            }
-          }
-        }
-      }
-    ],
-    "Generate an image1": [
-      {
-        "json": {
-          "mimeType": "image/png",
-          "fileType": "image",
-          "fileExtension": "png",
-          "fileName": "image.png",
-          "id": "filesystem-v2:workflows/ULOIR2Ukk7gLgxTv/executions/41/binary_data/ec191d90-51e6-4985-aa92-e047a550ac5f",
-          "fileSize": "1.63 MB"
-        },
-        "binary": {
-          "data": {
-            "mimeType": "image/png",
-            "fileType": "image",
-            "fileExtension": "png",
-            "data": "filesystem-v2",
-            "fileName": "image.png",
-            "id": "filesystem-v2:workflows/ULOIR2Ukk7gLgxTv/executions/41/binary_data/ec191d90-51e6-4985-aa92-e047a550ac5f",
-            "fileSize": "1.63 MB"
-          }
-        }
-      }
-    ],
-    "AI Agent": [
-      {
-        "json": {
-          "output": {
-            "virality_score": 86,
-            "virality_analysis": "The post taps into universal curiosity — centuries-old continuity, family legacy, and stunning architecture. High upvotes/comments indicate strong emotional engagement (awe, nostalgia, surprise). The mix of visual grandeur and an almost unbelievable fact makes it highly shareable across history, travel, and design communities.",
-            "twitter_image": {
-              "dalle_prompt": "Photorealistic cinematic aerial view of an ancient European castle at golden hour, perched on a rocky hill with rolling green countryside below, dramatic clouds, warm golden sunlight contrasting with teal shadows. Include a tasteful, slightly weathered family crest embossed subtly on a stone wall in the foreground, and a semi-transparent parchment-style ribbon across the lower third reading '800+ YEARS' (leave space for overlay text). Style: ultra-detailed photorealism with light film grain, shallow depth of field, HDR color grading. Composition: rule of thirds, castle slightly off-center left, crest foreground right; add soft lens flare and slight vignette for scroll-stopping contrast. Mood: awe-inspiring, timeless, mysterious. Color palette: warm golds, deep teals, moss greens, stone grays. Include direction: leave clean top-left area for headline text and provide alt-text: 'A dramatic aerial shot of a centuries-old castle at golden hour with a carved family crest in foreground.'",
-              "viral_caption": "Same family. Same castle. For over 800 years. 😲🏰\n\nHow has one family kept it for so long? Discover the secrets of lineage, land, and legacy. 👇\n#History #Heritage #Architecture"
-            },
-            "video_clip_8sec": {
-              "concept": "Vertical (9:16). Second-by-second breakdown:\n0.00-0.01 — Instant visual hook: ultra-fast aerial snap of the castle with a bold white text overlay: '800+ YEARS?!' Big, high-contrast typography, slight zoom-in. (Silent-friendly visual pop)\n0.01-0.03 — Cut to a close-up of carved stone and a family crest/insignia; textured slow push-in, overlay text: 'Same family. Same home.'\n0.03-0.05 — Smooth parallax pullback revealing a timeline ribbon sliding across the screen with quick date flashes (1200 → 1600 → 1800 → 2000), slight film grain and parallax motion.\n0.05-0.07 — Montage of archival-style portrait fades (silhouettes/sepia) and a slow reveal of an old iron key turning in an oak door; overlay text: 'Unbroken ownership.'\n0.07-0.08 — Smash cut to CTA frame: bold text 'Want the story? 👇' with animated arrow pointing down and subtle logo/handle. End on a crisp frame for screenshot/share.\nTransitions: whip-pan and cross-zoom, fast first frame to hook, then smoother cinematic moves. Text overlays are large, high-contrast, sans-serif, and legible for mute viewing. Use subtle film grain and warm color grade.",
-              "script": "Text overlay/voice: '800+ years. One family. One castle. Want the story? 👇'",
-              "viral_caption": "A single family has owned this castle for over 800 years. 😳🏰\nCurious how it happened? Watch & tap to learn more. 👇\n🔔 Follow for the full story! #History #Heritage",
-              "visual_style": "cinematic, bold, modern — color palette: warm golds, deep teals, stone grays; motion style: quick hook then smooth parallax and whip-pan transitions",
-              "music_mood": "dramatic"
-            },
-            "youtube_content": {
-              "title": "Inside the Castle Owned by One Family for 800 Years",
-              "description": "An astonishing story of continuity: a single family owning the same castle for over 800 years. We break down the history, architecture, and surprising reasons behind continuous ownership.\n\nTimestamps:\n0:00 Intro & hook\n0:10 How it started — medieval beginnings\n0:25 Key moments & survival through wars\n0:40 How the family preserved ownership\n0:50 What this tells us about heritage & legacy\n\nLike + Subscribe for more historical deep dives and leave your theories in the comments — where would you live for 800 years?\n\nSources: original Reddit thread and historical archives linked in the description (check pinned comment).\n\n#History #Castles #Heritage #Architecture #Genealogy #Medieval #Legacy #Travel",
-              "video_script": "[0:00-0:05] Hook: \"One castle. One family. Over 800 YEARS.\"\n[0:05-0:15] Context: \"This fortress has stood through wars, marriages, and revolutions — yet the same family never left. How?\"\n[0:15-0:30] Main content: \"It began in the medieval era as a fortified manor. Over centuries, strategic marriages, shrewd legal moves, and local influence helped keep it in the family. The estate adapted — from military stronghold to symbolic heritage site.\" \n[0:30-0:45] Key moments: \"We highlight 3 turning points: survival during conflict, clever inheritance laws, and modernization that kept the estate economically viable.\" \n[0:45-0:55] Visuals & proof: \"Show archival photos, crest close-ups, timeline graphics, and expert quotes.\"\n[0:55-1:00] CTA: \"Want the full deep dive? Like, subscribe, and check the pinned comment for sources. Tell us — would you keep a castle for 800 years?\""
-            },
-            "instagram_post": {
-              "caption": "Same castle. Same family. For OVER 800 years. 😳🏰\n\nImagine dinner conversations that include centuries of family secrets, wars, and weddings — all in one estate. This isn’t just a building, it’s a living timeline. From stone carvings to an iron key passed down like a heirloom, every corner holds a story.✨\n\nWhich era would you want to peek into? Comment below. 👇\n\n🔎 Want a deep dive? Check bio link and save this post for later! 📌\n\n🕰️🗝️🏰📜👑🛡️🌿📷🔥💬🎥🌟🖋️\n\n#heritage #history #castle #architecture #genealogy #medieval #travelgram #historic #ancestry #archaeology #legacy #oldhouse #culturalheritage #timetravel #preservation #europe #wanderlust #storytelling #timeless",
-              "carousel_ideas": [
-                "Slide 1: Dramatic aerial shot with headline '800+ Years — Same Family'.",
-                "Slide 2: Close-up of family crest + short caption about lineage and symbolism.",
-                "Slide 3: Timeline graphic showing key centuries and turning points with icons.",
-                "Slide 4: Interior details (hearth, key, portrait) and question CTA: 'Which era would you visit?'"
-              ]
-            },
-            "telegram_message": "*A castle owned by the same family for OVER 800 years 😲🏰*\n\n_Why it matters:_ This isn’t just old stone — it’s continuous family history, survival, and adaptation across centuries.\n\n• Photo: dramatic aerial at golden hour\n• Quick fact: 800+ years of ownership\n• Dive deeper: full story + timeline in comments 👇\n\nWant the thread? Reply with \"Tell me more\" and I’ll drop the sources and timeline. 🔎📜",
-            "tags": [
-              "history",
-              "castles",
-              "heritage",
-              "architecture",
-              "genealogy",
-              "medieval",
-              "travel",
-              "legacy"
-            ],
-            "content_strategy": {
-              "best_posting_times": "Twitter/X: 12:00–2:00 PM local (weekdays) for shareability. Instagram: 11:00 AM & 7:00 PM (Wed/Thu best). YouTube short: 6:00–9:00 PM (evening viewers). Telegram: 8:00–10:00 AM for engaged subscribers.",
-              "target_audience": "History lovers, architecture and travel enthusiasts, genealogy fans, and millennial/Gen Z users interested in unbelievable facts and visual stories (age 18–45).",
-              "engagement_tactics": [
-                "Ask a direct, curiosity-driven question in the caption (e.g., 'Which era would you visit?') to drive comments.",
-                "Use a 3–5 post carousel or thread that teases details, then link to a long-form piece or YouTube for the full story.",
-                "Encourage user-generated content: ask followers to share family heirloom photos with a branded hashtag.",
-                "Pin the highest-engagement comment with a short timeline and source link to reduce misinformation."
-              ]
-            }
-          }
-        }
-      },
-      {
-        "json": {
-          "output": {
-            "virality_score": 88,
-            "virality_analysis": "High visual surprise + strong shareability: image of a bobcat sleeping on cactus combines shock, cuteness, and a clear survival angle. Large Reddit engagement shows strong emotional and curiosity pull. Easily repackaged into short video, image posts, and listicle-style content for wide platforms.",
-            "twitter_image": {
-              "dalle_prompt": "Photorealistic close-up of a bobcat comfortably perched and napping among the arms of a tall saguaro cactus at golden hour in the Arizona desert. Ultra-detailed fur texture, visible whiskers, relaxed face, careful balance on cactus pads with sharp, glinting spines in foreground. Warm golden-orange backlight, soft rim lighting on cat, cool teal shadows in background for contrast. Shallow depth of field, bokeh desert horizon, dramatic cinematic composition (rule of thirds) — bobcat slightly off-center looking peaceful. Add subtle dust motes in sunlight, and a thin, tasteful caption area at the bottom-left for overlay text. Style: hyper-realistic 3D-photoreal render with film grain, high contrast color grading (warm golds + deep teals), punchy saturation to pop on feeds. Include negative space for tweet text and ensure subject is instantly readable as a thumbnail.",
-              "viral_caption": "They sleep on CACTUS? 🌵😳\nBobcats use saguaros & spiny chollas like natural watchtowers — safety, shade, and a cool breeze above predators. \nA wild survival hack that actually makes sense. 🔥\nLearned something new? RT & follow for more wild facts. #Nature #Wildlife"
-            },
-            "video_clip_8sec": {
-              "concept": "Vertical 9:16, 8-second hook-first sequence for silent autoplay. Second-by-second breakdown: [0.0-0.8s] Extreme close-up of a bobcat's ear and whiskers, fast zoom-out; bold white text overlay: \"They SLEEP on CACTUS?!\" (large, top). Quick camera pop with a micro-lens flare to grab attention. [0.8-2.5s] Cut to a medium shot of a bobcat curled on a saguaro arm, slow push in; text overlay line 2: \"Arizona's secret survival hack\" (center). [2.5-4.5s] Wide shot showing height above desert floor with coyotes running below out-of-focus; text overlay: \"Safe from predators ↓\" with animated downward arrow pointing to ground. [4.5-6.5s] Close-up on cactus spines and bobcat's paw; quick pulse transition; text overlay: \"Shade + Watchtower + Cool air\" (split into three short lines). [6.5-8.0s] End card: bobcat yawns, camera stabilizes; final overlay: \"Nature's weirdest idea →\" plus a CTA: \"Tap to learn more 🔎\" with logo. Use bold, high-contrast text with semi-transparent dark bar behind for silent readability. Subtle motion (parallax) and quick punch transitions to sustain attention.",
-              "script": "Text overlays / VO (either or):\n0.0-0.8s: \"They SLEEP on CACTUS?!\" \n0.8-2.5s: \"Arizona's secret survival hack\" \n2.5-4.5s: \"Safe from predators ↓\" \n4.5-6.5s: \"Shade • Watchtower • Cooler air\" \n6.5-8.0s: \"Nature's weirdest idea → Tap to learn more 🔎\"",
-              "viral_caption": "You won't believe where bobcats nap 😳🌵\nFrom spiny chollas to tall saguaros — survival-level theater in the Arizona desert. \nTap to watch more incredible nature hacks! 🔎🔥 #NatureTok #Wildlife",
-              "visual_style": "Cinematic, modern, bold. Color palette: warm golds, deep teals, sandy neutrals. Motion style: quick micro-zooms, parallax, bold kinetic text, high-contrast overlays for silent play.",
-              "music_mood": "suspenseful"
-            },
-            "youtube_content": {
-              "title": "Bobcats That Sleep on Cactus — Desert Survival Secret",
-              "description": "Discover why bobcats in Arizona sleep on cacti and how this odd behavior keeps them safe. In this short video we explain the survival reasons — shade, predator avoidance, and a cooler perch. Watch, share, and subscribe for more surprising wildlife facts. \n\nTimestamps:\n0:00 Intro — weird desert behavior\n0:06 Why cacti? Shade & safety\n0:20 Predator avoidance explained\n0:35 How it helps with heat\n0:50 Quick recap & CTA\n\nSubscribe for more wildlife surprises ➤ [link]\nFollow us on Instagram: [handle]\n\nHashtags:\n#Bobcat #DesertWildlife #NatureFacts #Wildlife #Survival #Arizona #Cactus #AnimalBehavior #Shorts #Nature",
-              "video_script": "[0:00-0:05] Hook (visual + voice): \"You thought bobcats slept on the ground? Think again — they nap on CACTUS.\" (fast cut from close-up to wide) \n[0:05-0:15] Context: \"In Arizona’s brutal heat, bobcats climb saguaros and chollas to sleep — a surprising but effective survival trick.\" (show bobcat perched) \n[0:15-0:30] Main content: \"Perching above the ground keeps them out of reach from coyotes and snakes. The cactus also provides shade and a cooler breeze — like a natural watchtower.\" (overlay bullet points, slow push-in) \n[0:30-0:45] Evidence & detail: \"You’ll often see them high enough to spot danger early. Yes, those needles look dangerous — but bobcats are agile and know where to sit.\" (show close-ups of spines and paws) \n[0:45-0:55] Quick takeaway: \"Strange sight, perfect logic — in the desert, every advantage counts.\" (short montage) \n[0:55-1:00] CTA: \"If this blew your mind, like, subscribe, and share for more wild facts!\" (end card with subscribe button)"
-            },
-            "instagram_post": {
-              "caption": "They sleep on CACTUS. 🌵😮\n\nIn the Arizona desert, bobcats climb saguaros and spiny chollas to nap — safe from coyotes, snakes, and scorching ground heat. It looks bizarre, but it’s pure survival engineering. 🐾✨\n\nSwipe to see how it works — and save this if you love weird nature facts. 🔖\n\n🌞🧐🦊🌵🔥📸👀🌾🛡️🍂🔎💚🤯🪶\n\n#bobcat #desertlife #naturelover #wildlifephotography #animalbehavior #survival #arizona #cactus #naturefacts #wildlife",
-              "carousel_ideas": [
-                "Slide 1: Eye-catching close-up photo of a bobcat on a saguaro with a bold headline: \"They Sleep on CACTUS?!\"",
-                "Slide 2: Infographic showing reasons — Shade / Predator avoidance / Cooler air — with simple icons.",
-                "Slide 3: Photo sequence showing height above ground and nearby predators (silhouettes of coyotes).",
-                "Slide 4: Close-up of cactus spines and bobcat paw, with a short tip: \"How they avoid getting hurt.\"",
-                "Slide 5: CTA slide: \"Save this post + Follow for more wild facts\" with subscribe icon"
-              ]
-            },
-            "telegram_message": "*Wild fact of the day!* 🌵🐾\n\n_They sleep on CACTUS._\n\nIn Arizona’s brutal heat, bobcats climb saguaros and spiny chollas to nap — staying above coyotes, snakes, and the hottest ground. It’s strange to us, but it’s a brilliant survival hack.\n\n🔍 Why it works:\n• Shade + cooler air\n• Elevated watchtower vs. predators\n• Keeps them out of reach\n\nWant more quick nature shocks? ➤ Tap the link and share with a friend who loves weird animals! 🔗",
-            "tags": [
-              "bobcat",
-              "wildlife",
-              "nature",
-              "desert",
-              "survival",
-              "animals",
-              "conservation",
-              "wildlifephotography",
-              "animalbehavior",
-              "viral"
-            ],
-            "content_strategy": {
-              "best_posting_times": "Twitter/X: 12:00–1:30 PM & 6:00–8:30 PM local time. Instagram: 11:00 AM–1:00 PM and 7:00–9:00 PM. YouTube Shorts: 5:00–8:00 PM. Telegram: 8:00–10:00 AM for morning reads.",
-              "target_audience": "Nature lovers, wildlife photographers, curious learners, conservation-minded viewers, and short-form video audiences (18–45 years old).",
-              "engagement_tactics": [
-                "Use a 1–2 slide teaser on Twitter with a link to a short video to drive clicks.",
-                "Pin a short 8s clip or GIF to the top of profiles to maximize repeat views.",
-                "Ask a single-question CTA in captions (e.g., “Would you sleep on a cactus?”) to boost comments and replies.",
-                "Use alt text for images and enable captions on videos to increase accessibility and silent-view engagement.",
-                "Encourage UGC: ask followers to share weird animal facts and tag your account for a curated thread."
-              ]
-            }
-          }
-        }
-      },
-      {
-        "json": {
-          "output": {
-            "virality_score": 86,
-            "virality_analysis": "High upvotes and solid comment count indicate strong emotional appeal (likely cuteness + clever costume). The post is relatable (pets/kids in costumes), easily shareable, and sparks short-form reactions (likes, shares, memes). Low controversy keeps it broadly shareable across platforms.",
-            "twitter_image": {
-              "dalle_prompt": "Photorealistic, heart-melting close-up of a tiny 'little guy' (small dog or toddler-sized silhouette - ambiguous, adorable) wearing an unexpected, clever Halloween costume that reads as 'winner' — think handmade miniature astronaut pumpkin suit with tiny reflective helmet, stitched orange fabric and soft LED glow. Style: high-detail photorealism with shallow depth of field, golden-hour warm lighting and high contrast so it pops on feed. Composition: centered subject, eyes at upper-third, slight low-angle to make costume feel heroic; negative space on the right for caption/text overlay. Color palette: warm oranges, deep midnight blue background, soft gold highlights. Mood: playful, triumphant, heartwarming. Include space for bold white text at lower-right (safe margin) that reads: \"Costume of the Year\" (suggested placement only). Add subtle motion blur on tiny floating confetti to imply celebration. Art direction: editorial pet/child portrait, ultra-detailed fur/skin texture, soft film grain, Instagram-ready crop (1:1 and 4:5 variants).",
-              "viral_caption": "Stop scrolling — this little guy just won Halloween 🎃🐾\nWho else would give him the trophy? 🏆\nShare if this made your day! ❤️\n#Halloween #CostumeOfTheYear #TooCute"
-            },
-            "video_clip_8sec": {
-              "concept": "Vertical 9:16, 8 seconds. Second-by-second breakdown:\n0.0–0.8s: Instant visual hook — extreme close-up on sparkling eyes (zoom-in) with bold white text overlay: \"Officially...\" (fast type-in, large). Quick whoosh sound trans/visual pulse.\n0.8–2.0s: Cut to rapid reveal: full body shot of the 'little guy' in the costume, slow 3/4 turn. Text overlay line 1: \"Costume of the Year\" (center, drop shadow). Subtle confetti pop animation.\n2.0–4.5s: Reaction shot montage (0.5s each) of people laughing/clapping, pet/tiny human wagging tail/doing a tiny spin — jump cuts synced to beat. Text overlay line 2: \"No contest.\"\n4.5–6.5s: Hero pull-back: cinematic reveal of environment (front porch/mini stage) with warm lights; camera pushes out slightly while vignette brightens. Text overlay: \"Official winner 🏆\" with playful badge animation at 5.8s.\n6.5–8.0s: Close-up on face, tiny head tilt, final on-screen CTA: \"Tag someone who needs to see this →\" with arrow animation and app-optimized CTA button mock. End frame holds last 0.7s for share/screenshot.\nTransitions: quick whoosh + pop for reveals, smooth zoom for emotional beats. Use big, legible sans-serif text (white with dark stroke) optimized for silent viewers. ",
-              "script": "Text overlays + quick VO whisper (optional):\n[0.0] \"Officially...\"\n[0.8] \"Costume of the Year\"\n[2.0] \"No contest.\"\n[6.5] \"Tag who’d love this!\"",
-              "viral_caption": "You won't believe how adorable this is 😍🎃\nOfficially the Costume of the Year — tag someone who needs to see it! 👇🏆\n#Halloween #CostumeOfTheYear #TooCute",
-              "visual_style": "trendy/cinematic with bold typographic overlays; color palette: warm oranges, deep navy, soft gold accents; motion style: quick edits for hooks, smooth cinematic push-outs for emotional beats.",
-              "music_mood": "upbeat"
-            },
-            "youtube_content": {
-              "title": "Tiny Winner: Halloween Costume of the Year 🏆🎃",
-              "description": "The internet has spoken — this tiny costume just stole Halloween. Watch the reveal, reactions, and why people can’t stop sharing this adorable moment. Short, sweet, and totally shareable. \n\nTimestamps:\n0:00 Intro & hook\n0:05 First reveal\n0:15 Reaction montage\n0:35 Behind-the-scenes details\n0:50 Final reveal & CTA\n\nIf you loved this, hit Like, Subscribe, and share with friends who need a smile! \n\nHashtags: #Halloween #CostumeOfTheYear #CuteCostume #Viral #PetCostume #DIY #Halloween2025 #CostumeReveal",
-              "video_script": "[0:00-0:05] Hook: \"Stop scrolling — this tiny costume just won Halloween!\" (fast reveal tease)\n[0:05-0:15] Context: \"We found the internet's new favorite costume — tiny, clever, and impossible not to love.\" (show full reveal)\n[0:15-0:35] Main: \"Look at the detail: handmade fabric, tiny props, and the reaction shots say it all — everyone lost it.\" (cut to montage of laughter/reactions)\n[0:35-0:50] Value/behind-the-scenes: \"Want to recreate this? Simple materials, a bit of glue, and big imagination — we'll drop a DIY link in the description.\" (show quick B-roll of costume elements)\n[0:50-1:00] CTA: \"If this made you smile, hit like, subscribe, and tag someone who needs to see it — more wholesome finds every week!\" (end with logo and subscribe animation)"
-            },
-            "instagram_post": {
-              "caption": "It's official — this little guy just won Halloween 🏆🎃\n\nWhether it’s the tiny details, the handmade charm, or that adorable head tilt... we can’t stop smiling. 😭❤️\n\nWho would you give the award to? Tag them below and save this for costume inspo! 👇\n\n🎃🧡🐾✨🏆😍😂👏📸🌟🥰🤩\n\n#Halloween #CostumeOfTheYear #TooCute #PetCostume #TinyButMighty #DIYCostume #CuteAlert #HalloweenInspo #CostumeGoals #ViralMoment #Wholesome #FallVibes #SpookyCute #CostumeReveal #LaughOutLoud #InstaGood #HappyHalloween #Adorable #CreativeCostume #HalloweenIdeas #ShareTheJoy #SmileMore",
-              "carousel_ideas": [
-                "Slide 1: Full-frame hero shot of the costume with bold title overlay \"Costume of the Year\"",
-                "Slide 2: Close-ups of costume details (stitching, props, tiny LEDs) with short captions",
-                "Slide 3: Reaction shots — family/friends/pets cheering and laughing",
-                "Slide 4: Behind-the-scenes materials and 3 quick DIY steps",
-                "Slide 5: CTA slide — \"Tag someone who needs this\" + save/share icons"
-              ]
-            },
-            "telegram_message": "**It's official — Costume of the Year!** 🎃🏆\n\n*This little guy just made the internet melt.* 🥹\n\n👉 Tap to see the reveal\n\nWhy it's winning:\n• Tiny, clever design\n• Pure reaction content = share gold\n• Perfect for quick reposts & memes\n\n🔁 Share it with friends\n❤️ Save it for costume inspo\n\n#Halloween #CostumeOfTheYear #TooCute",
-            "tags": [
-              "Halloween",
-              "CostumeOfTheYear",
-              "Cute",
-              "Viral",
-              "DIY",
-              "PetCostume",
-              "Wholesome",
-              "CostumeInspo"
-            ],
-            "content_strategy": {
-              "best_posting_times": "Twitter/X: 12–2 PM and 6–9 PM local time. Instagram: 11 AM–1 PM and 7–9 PM (weekdays). TikTok/Shorts: 6–10 PM when younger audiences browse. YouTube: 5–8 PM for short-form reveals.",
-              "target_audience": "Young adults 18–34 who enjoy wholesome viral content, pet owners, parents, DIY/costume enthusiasts, and general social media users looking for shareable, feel-good posts.",
-              "engagement_tactics": [
-                "Ask viewers to tag a friend who’d love this in the first comment to drive reach.",
-                "Create a simple branded hashtag challenge (e.g., #CostumeOfTheYear) and encourage duets/stitches.",
-                "Post a behind-the-scenes DIY follow-up to capture longer watch time and conversions.",
-                "Run a 24-hour pinned comment contest: best caption wins a shoutout to boost comments."
-              ]
-            }
-          }
-        }
-      },
-      {
-        "json": {
-          "output": {
-            "virality_score": 86,
-            "virality_analysis": "Highly shareable mix of petty justice, humor, and DIY creativity. Clear emotional hook (satisfaction + schadenfreude), strong visual payoff (car getting sprayed), and broad relatability for homeowners and city dwellers. Upvotes and comments indicate strong engagement potential across platforms with easy-to-replicate format for memes and short videos.",
-            "twitter_image": {
-              "dalle_prompt": "Photorealistic, cinematic wide-angle shot of a suburban Australian driveway during golden hour. Foreground: a compact car mid-reverse with a surprised driver visible through the window, water arcs dramatically towards the vehicle from a motion-activated lawn sprinkler mounted near the driveway edge. Middle ground: a smiling, cheeky homeowner (casual t-shirt, relaxed pose) pointing at the sprinkler. Background: a tidy brick house with eucalyptus tree, warm sunlight, and lens flare. Composition: dynamic diagonal lines, splash frozen in mid-air with high shutter-speed effect, shallow depth of field, high contrast, saturated warm tones (golden yellows, deep teal water), clear space in top-left for bold headline text. Mood: playful, triumphant, slightly mischievous. Style cues: hyper-real photorealism + editorial viral-photo treatment, crisp detail, dramatic splash highlights. Include placeholder for overlay text: top-left: \"PROBLEM SOLVED\" in bold condensed sans-serif. Make image scroll-stopping, shareable, meme-ready.",
-              "viral_caption": "He had enough — so he solved it like a legend. 🌊🚗\n\nMotion-activated sprinkler = instant driveway eviction. 😅\n\nWould you do this? 👇\n#LifeHack #PettyWins"
-            },
-            "video_clip_8sec": {
-              "concept": "Vertical 9:16 format. Second-by-second breakdown:\n0.0-0.8s: Instant visual hook — close-up on a bright blinking motion sensor light, quick zoom-out; bold white text overlay top: \"Sick of people parking in your driveway?\" (large, readable). Quick whoosh sound (but design for mute).\n0.8-2.2s: Cut to POV/back shot of a car creeping into the driveway; camera locked low to the ground showing tire and driveway; text overlay: \"He did this...\" (slide-in). \n2.2-4.5s: The motion-activated sprinkler fires; slow-motion water arc splashes over the rear of the car; driver flinches, water beads on window — freeze-frame 0.2s, text overlay: \"Motion-activated sprinkler\" (bold). Add subtle splash freeze graphic.\n4.5-6.5s: Reaction shot — homeowner grinning and giving a thumbs-up; quick close-up of sprinkler unit with a small DIY label; text overlay: \"Problem solved.\" (punchy). \n6.5-8.0s: Call-to-action end card: text \"Would you try this? Comment👇\" with two buttons-style graphics: \"Like\" and \"Share\"; final frame also shows account handle and 2 hashtags. Use fast, clean jump cuts and subtle motion graphics for overlays. Ensure each overlay large enough for silent autoplay viewing.",
-              "script": "Text/VO: \"Tired of driveway parkers?\" → \"So he installed a motion-activated sprinkler.\" → \"Problem. Solved.\" → \"Would you try it?👇\"",
-              "viral_caption": "When people keep blocking your driveway... you get creative. 😏💦\nWould YOU do this? Drop a comment! 👇\n#DIY #PettyWins",
-              "visual_style": "modern/cinematic/trendy — warm golden-hour palette with aqua/teal water pops. Motion style: quick cuts, smooth whip-pans, subtle slow-mo splash for payoff. Clean bold sans-serif text overlays with drop shadow.",
-              "music_mood": "upbeat"
-            },
-            "youtube_content": {
-              "title": "Genius Aussie Stops Driveway Parkers with Sprinkler",
-              "description": "Watch how one Aussie turned petty frustration into a brilliant DIY solution: a motion-activated sprinkler that chases off driveway parkers. Full footage, reactions, and quick tips on how this works and the legal/safety things to consider. \n\nTimestamps:\n0:00 Intro + viral clip\n0:08 The setup explained\n0:25 Why it works (and community reactions)\n0:40 Quick DIY tips\n0:50 Final thoughts & safety notes\n\nIf you liked this, hit Like, Subscribe, and turn on notifications for more clever hacks and viral moments.\n\n#DIY #LifeHack #Viral #PettyWins #Aussie #SprinklerHack #HomeHacks #NeighborProblems",
-              "video_script": "[0:00-0:05] Hook: \"Sick of strangers parking in your driveway? This Aussie had enough — watch what he did.\" \n[0:05-0:15] Context: \"We caught this viral moment — homeowner installs a motion-activated sprinkler to protect his driveway. It triggers exactly when someone parks.\" \n[0:15-0:35] Main footage: \"Here’s the clip in full — slow-mo splash and the driver’s reaction. You can see the motion sensor trigger and the perfect arc of water. People loved the petty justice.\" \n[0:35-0:50] Tips & safety: \"If you try something similar: check local laws, avoid harmful setups, use a low-pressure sprinkler, and post signs. This is about deterrence, not harm.\" \n[0:50-1:00] CTA: \"Would you do this? Comment below, share your own petty wins, and subscribe for more clever DIY fixes!\""
-            },
-            "instagram_post": {
-              "caption": "He got fed up... so he fought back with water. 🌊😆\n\nImagine showing up to park and getting instantly soaked — petty, genius, and oddly satisfying. The motion-activated sprinkler nailed the perfect revenge: harmless, hilarious, and highly shareable.\n\nWould you set one up? Tell us your best petty revenge below 👇\n\n🔥💧😂🛠️👍🙈😜🇦🇺🚗👏🤯🤳\n\n#DIY #PettyWins #LifeHack #Aussie #NeighborProblems #HomeHacks #SprinklerHack #Funny #Viral #Shorts #StreetJustice #CleanRevenge #HackIt #Humor #Epic #Trending #GoViral #ProblemSolved #SocialMedia",
-              "carousel_ideas": [
-                "Slide 1: Before — car parked blocking driveway (wide shot) with caption 'The problem'.",
-                "Slide 2: The setup — close-up of motion sensor and sprinkler with short DIY notes.",
-                "Slide 3: The moment — freeze-frame splash slow-mo with reaction bubble and 'Score.'",
-                "Slide 4: Safety tips — quick reminders (low pressure, signage, legal check).",
-                "Slide 5: Poll/CTA — \"Would you do it? Yes / No\" with sticker encouragement."
-              ]
-            },
-            "telegram_message": "**He had enough — so he installed a motion-activated sprinkler.** 🌊😅\n\n• *What happened:* A car parks in his driveway → sprinkler activates → instant soak.\n• *Why it went viral:* Harmless revenge + perfect visual payoff = shareable content.\n\n👉 Would you try this? Reply with your funniest petty revenge! 👇\n\n#DIY #PettyWins #Viral",
-            "tags": [
-              "DIY",
-              "LifeHack",
-              "PettyWins",
-              "Viral",
-              "HomeHacks",
-              "Aussie",
-              "NeighborProblems",
-              "Shorts",
-              "Funny"
-            ],
-            "content_strategy": {
-              "best_posting_times": "Twitter/X: Weekdays 12:00-15:00 local time; Instagram: Mon-Wed 11:00-13:00 and evenings 19:00-21:00; YouTube: Thursdays/Fridays 17:00-20:00; Telegram: Evenings 18:00-21:00 for high engagement.",
-              "target_audience": "Homeowners and renters aged 18-45 who enjoy DIY solutions, petty justice content, viral short-form videos, and lighthearted humor — especially in urban/suburban communities.",
-              "engagement_tactics": [
-                "Ask a polarizing question in the caption (e.g., 'Would you do this?') to drive comments.",
-                "Run a poll (Instagram Stories/Twitter) asking 'Petty revenge: genius or petty?' and repost results.",
-                "Encourage UGC: ask followers to share their own harmless revenge stories and tag the account.",
-                "Use short clips for Reels/Shorts with a pinned comment CTA to boost engagement.",
-                "Add subtitles for silent viewing and an eye-catching first frame for autoplay."
-              ]
-            }
-          }
-        }
-      },
-      {
-        "json": {
-          "output": {
-            "virality_score": 86,
-            "virality_analysis": "Short, punchy title + high upvotes means instant curiosity and relatability. The phrase 'If it fits, it's forever' taps into pet behavior memes and human relationship humor—high shareability, low controversy, and strong emotional (cute/funny) pull that drives comments and reshares.",
-            "twitter_image": {
-              "dalle_prompt": "Photorealistic close-up of an adorably chonky cat gently curled and perfectly squeezed into a tiny, clearly-too-small cardboard box, shot from a slightly top-down angle. Warm golden-hour lighting, shallow depth of field with a creamy bokeh background in soft pastel tones (peach, mint, warm beige). Include a bold, hand-lettered style caption area at the top third that reads: \"If it fits, it's forever\" in white text with a subtle drop shadow; leave negative space for text. Style: high-res editorial pet photography with a playful, meme-ready composition. Mood: cozy, triumphant, humorous. Color accents: warm orange and teal to make it pop on feeds. Add subtle motion blur on box edges to imply a snug squeeze. Composition suggestion: cat centered, box slightly tilted, room for caption overlay and logo watermark in bottom-right.",
-              "viral_caption": "You know the rule 🐾\n\nIf it fits — it's forever. ❤️\n\nTag someone who would adopt this logic. 😂👇\n\n#CatsOfTwitter #Cute"
-            },
-            "video_clip_8sec": {
-              "concept": "Vertical (9:16). Second-by-second: 0.0-0.8s — Instant hook: rapid close-up snap to an empty tiny box with a pulsing outline; big white bold text overlay: \"Will it fit?\". 0.8-2.5s — Quick cut to a curious cat sniffing/hovering at box edge (slow-motion 1.2x); soft zoom in. Text overlay: \"Challenge accepted\" (small). 2.5-5.0s — Fast montage of cat squeezing, wriggling, then flopping into place (use jump cuts synced to beat). Overlay animated confetti/soft glow as cat settles. 5.0-6.5s — Close-up of cat's satisfied face; text overlay: \"If it fits…\" (large). 6.5-7.5s — Dramatic slow zoom-out showing cat locked in snugly; text overlay: \"…it's forever.\" (largest, bold). 7.5-8.0s — Quick CTA frame with subtle bounce: \"Tag who'd adopt this rule 👉\" and platform handle/hashtag. Transitions: quick whip cuts and a smooth slow-motion settle; use large, high-contrast captions for silent viewing. Color grading: warm, cozy tones with slight vignette. Add accessibility: caption bar at bottom with full text.",
-              "script": "Text/VO line 1 (0-1s): \"Will it fit?\"  \nText/VO line 2 (1-3s): \"Challenge accepted.\"  \nText/VO line 3 (3-5s): \"If it fits…\"  \nText/VO line 4 (5-7.5s): \"…it's forever.\"  \nFinal CTA (7.5-8s): \"Tag someone who lives by this rule 👇\"",
-              "viral_caption": "This is literally how decisions are made in this house 😹\nTag the friend who would never move the box ➡️👇\n#CatsOfInstagram #Cute #IfItFits",
-              "visual_style": "trendy/cinematic with playful edits; color palette: warm golds, soft teals, and cozy beiges; motion style: quick whip cuts into slow-motion settle, bold kinetic typography, subtle confetti/glow on payoff.",
-              "music_mood": "upbeat"
-            },
-            "youtube_content": {
-              "title": "If It Fits, It's Forever — The Cutest Cat Logic",
-              "description": "Watch what happens when a cat meets the perfect (too-small) box. Short, wholesome, and impossible not to smile at. Subscribe for more pet antics! \n\nTimestamps:\n0:00 Intro — The box challenge\n0:05 The approach\n0:20 Squeeze & settle\n0:40 The satisfied look\n0:55 CTA & blooper\n\nIf you loved this, like & share — and comment your pet's favorite hiding spot! 🐾\n\n#Cats #Cute #IfItFits #PetVideo #Viral #CatChallenge #Wholesome #CuteAnimals",
-              "video_script": "[0:00-0:05] Hook (fast cuts): \"Will it fit?\" Close-up on tiny box.  \n[0:05-0:15] Context: \"Every pet owner knows the rule: if it fits...\" Show cat approaching, sniffing.  \n[0:15-0:35] Main action: \"Watch the squeeze.\" Montage of the cat wobbling and squeezing in (use slow-mo on the successful moment). Add playful commentary: \"Yep. That's snug.\"  \n[0:35-0:50] Reaction: Close-up on content face; include quick tip: \"Pro tip: never move the box.\" (humorous).  \n[0:50-1:00] CTA: \"If this made you smile, subscribe for more pet rules and tag a friend below. Watch our playlist for more wholesome fails!\""
-            },
-            "instagram_post": {
-              "caption": "If it fits — it's forever. 🐾\n\nThis one claimed the box and our hearts. How does your pet choose their throne? 😂\n\nDrop a pic or tag someone who lives by the box rule. 👇\n\n😍🐱📦💤✨🥰🤣😹💛👀🎥🙌🧡\n\n#CatsOfInstagram #PetLife #IfItFits #Wholesome #CuteAnimals #PetLove #CatMom #CatDad #FurryFriend #CatsofIG #PetMemes #Adorable #CatLovers",
-              "carousel_ideas": [
-                "Slide 1: Hero photo — cat squeezed into the box with the quote overlay \"If it fits, it's forever.\"",
-                "Slide 2: Behind-the-scenes — boomerang of the cat approaching the box.",
-                "Slide 3: Close-up — cat's satisfied face with a funny caption bubble.",
-                "Slide 4: CTA — ask followers to share their pet's \"if it fits\" moment and tag friends."
-              ]
-            },
-            "telegram_message": "*If it fits, it's forever* 🐾\n\n_This one didn't negotiate._\n\n📦 Watch the tiny-box takeover: cat finds a too-small spot, squeezes in, and never leaves. Pure content. 😹\n\n👉 Share this with someone who'd never move the box.\n\n#Cats #Cute #Viral",
-            "tags": [
-              "cats",
-              "pets",
-              "memes",
-              "relatable",
-              "cute",
-              "viral",
-              "wholesome"
-            ],
-            "content_strategy": {
-              "best_posting_times": "Twitter/X: 12–2 PM and 6–9 PM local (weekdays). Instagram: 11 AM–1 PM and 7–9 PM. TikTok/Shorts: 6–10 PM (evenings). YouTube short: 5–8 PM on weekdays. Telegram: 8–10 AM for morning shares.",
-              "target_audience": "Pet owners, animal lovers, meme/community accounts, ages 18-44 who enjoy short, wholesome content and shareable pet moments.",
-              "engagement_tactics": [
-                "Ask for comments: \"Tag the friend who would never move the box.\"",
-                "Use a micro-challenge: invite followers to post #IfItFits clips and tag your account.",
-                "Post a follow-up: bloopers or user-submitted compilations to keep the thread alive.",
-                "Pin top comments and respond with GIFs to encourage conversation."
-              ]
-            }
-          }
-        }
-      }
-    ],
-    "Generate a video": [
-      {
-        "json": {
-          "mimeType": "video/mp4",
-          "fileType": "video",
-          "fileExtension": "mp4",
-          "fileName": "video.mp4",
-          "id": "filesystem-v2:workflows/ULOIR2Ukk7gLgxTv/executions/72/binary_data/3771025a-713f-4fa6-b01d-08a0dc1dd2ad",
-          "fileSize": "4.98 MB"
-        },
-        "binary": {
-          "data": {
-            "mimeType": "video/mp4",
-            "fileType": "video",
-            "fileExtension": "mp4",
-            "data": "filesystem-v2",
-            "fileName": "video.mp4",
-            "id": "filesystem-v2:workflows/ULOIR2Ukk7gLgxTv/executions/72/binary_data/3771025a-713f-4fa6-b01d-08a0dc1dd2ad",
-            "fileSize": "4.98 MB"
-          }
-        }
-      }
-    ]
-  },
+  "pinData": {},
   "connections": {
-    "When clicking ‘Execute workflow’": {
-      "main": [
-        [
-          {
-            "node": "Get many posts",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Get many posts": {
-      "main": [
-        [
-          {
-            "node": "Sort",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "OpenAI Chat Model": {
       "ai_languageModel": [
         [
           {
-            "node": "AI Agent",
+            "node": "Viral Content Generator",
             "type": "ai_languageModel",
             "index": 0
           },
@@ -748,44 +672,11 @@
         ]
       ]
     },
-    "Sort": {
-      "main": [
-        [
-          {
-            "node": "Limit",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Limit": {
-      "main": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "AI Agent": {
-      "main": [
-        [
-          {
-            "node": "Sort1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Think1": {
       "ai_tool": [
         [
           {
-            "node": "AI Agent",
+            "node": "Viral Content Generator",
             "type": "ai_tool",
             "index": 0
           }
@@ -796,46 +687,8 @@
       "ai_outputParser": [
         [
           {
-            "node": "AI Agent",
+            "node": "Viral Content Generator",
             "type": "ai_outputParser",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Sort1": {
-      "main": [
-        [
-          {
-            "node": "Limit1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Limit1": {
-      "main": [
-        [
-          {
-            "node": "Generate an image1",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Generate a video",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Generate an image1": {
-      "main": [
-        [
-          {
-            "node": "HTTP Request",
-            "type": "main",
             "index": 0
           }
         ]
@@ -852,17 +705,6 @@
         ]
       ]
     },
-    "Generate a video": {
-      "main": [
-        [
-          {
-            "node": "Upload a video",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Upload a video": {
       "main": [
         []
@@ -872,11 +714,194 @@
       "ai_memory": [
         [
           {
-            "node": "AI Agent",
+            "node": "Viral Content Generator",
             "type": "ai_memory",
             "index": 0
           }
         ]
+      ]
+    },
+    "Scrape Trendy post from reddit": {
+      "main": [
+        [
+          {
+            "node": "Sort posts based on virality",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Scrape Trendy post from reddit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sort posts based on virality": {
+      "main": [
+        [
+          {
+            "node": "Filter Top 5 Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Top 5 Posts": {
+      "main": [
+        [
+          {
+            "node": "Viral Content Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Viral Content Generator": {
+      "main": [
+        [
+          {
+            "node": "Sort ideas based on virality score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sort ideas based on virality score": {
+      "main": [
+        [
+          {
+            "node": "Filter top ideas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter top ideas": {
+      "main": [
+        [
+          {
+            "node": "Generate image",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Generate video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload video": {
+      "main": [
+        [
+          {
+            "node": "share video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload image": {
+      "main": [
+        [
+          {
+            "node": "share image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post photo to telegram channel": {
+      "main": [
+        []
+      ]
+    },
+    "Generate image": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Upload image",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Post photo to telegram channel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate video": {
+      "main": [
+        [
+          {
+            "node": "Upload a video",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Upload video",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Post video to telegram channel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "share image": {
+      "main": [
+        [
+          {
+            "node": "Facebook Image Container",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "share video": {
+      "main": [
+        [
+          {
+            "node": "Facebook Reel Container",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Facebook Image Container": {
+      "main": [
+        []
+      ]
+    },
+    "Facebook Reel Container": {
+      "main": [
+        []
       ]
     }
   },
@@ -884,7 +909,7 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "02cb798d-75aa-4869-9cb1-b1972bec5bfd",
+  "versionId": "4a6f8770-e481-4f24-9bcf-1338d74fe507",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "64814982c06dd4c677b5a395878452b64f1bc5ea22371445b37d295a2fa1adf6"
