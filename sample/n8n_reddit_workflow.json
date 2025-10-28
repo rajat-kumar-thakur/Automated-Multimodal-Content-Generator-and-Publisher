@@ -1,0 +1,565 @@
+{
+  "name": "Reddit Viral Content to Multi-Platform",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 2
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "post",
+        "operation": "getAll",
+        "subreddit": "all",
+        "category": "hot",
+        "limit": 50
+      },
+      "id": "reddit-fetch",
+      "name": "Fetch Reddit Hot Posts",
+      "type": "n8n-nodes-base.reddit",
+      "typeVersion": 1,
+      "position": [
+        460,
+        300
+      ],
+      "credentials": {
+        "redditOAuth2Api": {
+          "id": "1",
+          "name": "Reddit OAuth2 account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json.ups }}",
+              "operation": "larger",
+              "value2": 1000
+            },
+            {
+              "value1": "={{ $json.num_comments }}",
+              "operation": "larger",
+              "value2": 50
+            }
+          ],
+          "string": [
+            {
+              "value1": "={{ $json.post_hint }}",
+              "operation": "notEqual",
+              "value2": "image"
+            }
+          ]
+        },
+        "combineOperation": "all"
+      },
+      "id": "filter-viral",
+      "name": "Filter Viral Posts",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 1,
+      "position": [
+        680,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "url": "https://api.anthropic.com/v1/messages",
+        "method": "POST",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "anthropic-version",
+              "value": "2023-06-01"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"claude-sonnet-4-5-20250929\",\n  \"max_tokens\": 2048,\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"Analyze this Reddit post for content creation:\\n\\nTitle: {{ $json.title }}\\nContent: {{ $json.selftext }}\\nUpvotes: {{ $json.ups }}\\nComments: {{ $json.num_comments }}\\n\\nProvide a JSON response with:\\n1. virality_score (0-100)\\n2. video_script (60 second engaging script)\\n3. image_prompt (DALL-E prompt for eye-catching image)\\n4. youtube_title (catchy, SEO optimized)\\n5. youtube_description (with hashtags)\\n6. instagram_caption (with emojis and hashtags)\\n7. telegram_message\\n8. tags (array of relevant tags)\\n\\nFormat as valid JSON only.\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "id": "ai-content-analysis",
+      "name": "AI Content Analysis (Claude)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        900,
+        300
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "2",
+          "name": "Claude API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract AI response and parse JSON\nconst items = $input.all();\nconst results = [];\n\nfor (const item of items) {\n  try {\n    const aiResponse = item.json.content[0].text;\n    // Extract JSON from potential markdown code blocks\n    const jsonMatch = aiResponse.match(/```json\\n([\\s\\S]*?)\\n```/) || aiResponse.match(/\\{[\\s\\S]*\\}/);\n    const parsedContent = JSON.parse(jsonMatch ? jsonMatch[1] || jsonMatch[0] : aiResponse);\n    \n    results.push({\n      json: {\n        reddit_data: item.json,\n        ai_content: parsedContent,\n        original_url: item.json.url,\n        subreddit: item.json.subreddit\n      }\n    });\n  } catch (error) {\n    console.error('Error parsing AI response:', error);\n  }\n}\n\nreturn results;"
+      },
+      "id": "parse-ai-response",
+      "name": "Parse AI Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json.ai_content.virality_score }}",
+              "operation": "larger",
+              "value2": 70
+            }
+          ]
+        }
+      },
+      "id": "filter-high-virality",
+      "name": "Filter High Virality Score",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 1,
+      "position": [
+        1340,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "url": "https://api.openai.com/v1/images/generations",
+        "method": "POST",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"dall-e-3\",\n  \"prompt\": \"{{ $json.ai_content.image_prompt }}\",\n  \"n\": 1,\n  \"size\": \"1792x1024\",\n  \"quality\": \"hd\"\n}",
+        "options": {}
+      },
+      "id": "generate-image",
+      "name": "Generate Image (DALL-E)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1560,
+        200
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "3",
+          "name": "OpenAI API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.data[0].url }}",
+        "options": {}
+      },
+      "id": "download-image",
+      "name": "Download Generated Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1780,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "url": "https://veo3-api.example.com/v1/generate",
+        "method": "POST",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"prompt\": \"{{ $json.ai_content.video_script }}\",\n  \"duration\": 60,\n  \"resolution\": \"1080p\",\n  \"style\": \"dynamic\",\n  \"add_captions\": true,\n  \"add_music\": true\n}",
+        "options": {}
+      },
+      "id": "generate-video",
+      "name": "Generate Video (Veo 3)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1560,
+        400
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "4",
+          "name": "Veo 3 API Key"
+        }
+      },
+      "notes": "Replace with actual Veo 3 API endpoint when available"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.video_url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "download-video",
+      "name": "Download Generated Video",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1780,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "operation": "upload",
+        "title": "={{ $('Parse AI Response').item.json.ai_content.youtube_title }}",
+        "description": "={{ $('Parse AI Response').item.json.ai_content.youtube_description }}",
+        "tags": "={{ $('Parse AI Response').item.json.ai_content.tags.join(',') }}",
+        "privacyStatus": "public",
+        "binaryProperty": "data"
+      },
+      "id": "upload-youtube",
+      "name": "Upload to YouTube",
+      "type": "n8n-nodes-base.youtube",
+      "typeVersion": 1,
+      "position": [
+        2000,
+        300
+      ],
+      "credentials": {
+        "youtubeOAuth2Api": {
+          "id": "5",
+          "name": "YouTube OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "=@your_channel_name",
+        "text": "={{ $('Parse AI Response').item.json.ai_content.telegram_message }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "id": "post-telegram",
+      "name": "Post to Telegram Channel",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        2000,
+        450
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "6",
+          "name": "Telegram Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "url": "https://graph.facebook.com/v18.0/me/media",
+        "method": "POST",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"image_url\": \"{{ $('Download Generated Image').item.json.data[0].url }}\",\n  \"caption\": \"{{ $('Parse AI Response').item.json.ai_content.instagram_caption }}\",\n  \"media_type\": \"IMAGE\"\n}",
+        "options": {}
+      },
+      "id": "post-instagram",
+      "name": "Post to Instagram",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2000,
+        600
+      ],
+      "credentials": {
+        "oAuth2Api": {
+          "id": "7",
+          "name": "Instagram Business OAuth2"
+        }
+      },
+      "notes": "Requires Instagram Business Account"
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "table": "content_tracking",
+        "columns": "reddit_url, youtube_url, virality_score, posted_at, subreddit, upvotes",
+        "options": {}
+      },
+      "id": "log-database",
+      "name": "Log to Database",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.2,
+      "position": [
+        2220,
+        300
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "8",
+          "name": "PostgreSQL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://hooks.slack.com/services/YOUR/WEBHOOK/URL",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": \"🚀 New viral content posted!\",\n  \"blocks\": [\n    {\n      \"type\": \"section\",\n      \"text\": {\n        \"type\": \"mrkdwn\",\n        \"text\": \"*Reddit Post:* {{ $('Parse AI Response').item.json.reddit_data.title }}\\n*Virality Score:* {{ $('Parse AI Response').item.json.ai_content.virality_score }}/100\\n*Platforms:* YouTube, Instagram, Telegram\\n*Subreddit:* r/{{ $('Parse AI Response').item.json.subreddit }}\"\n      }\n    }\n  ]\n}",
+        "options": {}
+      },
+      "id": "notify-slack",
+      "name": "Notify Team (Slack)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2220,
+        450
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Add voice-over using ElevenLabs API\nconst script = $('Parse AI Response').item.json.ai_content.video_script;\n\nreturn {\n  json: {\n    text: script,\n    voice_id: \"21m00Tcm4TlvDq8ikWAM\", // Rachel voice\n    model_id: \"eleven_monolingual_v1\"\n  }\n};"
+      },
+      "id": "prepare-voiceover",
+      "name": "Prepare Voice-over",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1560,
+        550
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "url": "=https://api.elevenlabs.io/v1/text-to-speech/{{ $json.voice_id }}",
+        "method": "POST",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": \"{{ $json.text }}\",\n  \"model_id\": \"{{ $json.model_id }}\",\n  \"voice_settings\": {\n    \"stability\": 0.5,\n    \"similarity_boost\": 0.75\n  }\n}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "generate-voiceover",
+      "name": "Generate Voice-over",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1780,
+        550
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "9",
+          "name": "ElevenLabs API Key"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Fetch Reddit Hot Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Reddit Hot Posts": {
+      "main": [
+        [
+          {
+            "node": "Filter Viral Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Viral Posts": {
+      "main": [
+        [
+          {
+            "node": "AI Content Analysis (Claude)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Content Analysis (Claude)": {
+      "main": [
+        [
+          {
+            "node": "Parse AI Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse AI Response": {
+      "main": [
+        [
+          {
+            "node": "Filter High Virality Score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter High Virality Score": {
+      "main": [
+        [
+          {
+            "node": "Generate Image (DALL-E)",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Generate Video (Veo 3)",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Prepare Voice-over",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Image (DALL-E)": {
+      "main": [
+        [
+          {
+            "node": "Download Generated Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Generated Image": {
+      "main": [
+        [
+          {
+            "node": "Post to Instagram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Video (Veo 3)": {
+      "main": [
+        [
+          {
+            "node": "Download Generated Video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Generated Video": {
+      "main": [
+        [
+          {
+            "node": "Upload to YouTube",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Post to Telegram Channel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload to YouTube": {
+      "main": [
+        [
+          {
+            "node": "Log to Database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to Telegram Channel": {
+      "main": [
+        [
+          {
+            "node": "Notify Team (Slack)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Voice-over": {
+      "main": [
+        [
+          {
+            "node": "Generate Voice-over",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
